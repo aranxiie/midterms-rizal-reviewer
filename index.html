@@ -265,6 +265,7 @@
         let currentQuestionIndex = 0;
         let score = 0;
         let currentTopic = '';
+        const QUESTIONS_PER_QUIZ = 10;
         
         const topics = {
             'Hong Kong & Macao': [
@@ -329,7 +330,8 @@
                 { question: "Why did Rizal move from Paris to Brussels in 1890?", answers: [ { text: "The high cost of living in Paris", correct: true }, { text: "To escape the Spanish authorities", correct: false }, { text: "To be closer to the Jacoby sisters", correct: false }, { text: "To find a cheaper printer for his novel", correct: false } ] },
                 { question: "Who was the woman in Brussels who fell in love with Rizal and wrote him heartbreaking letters after he left?", answers: [ { text: "Suzanne Jacoby", correct: true }, { text: "Gertrude Beckett", correct: false }, { text: "Nelly Boustead", correct: false }, { text: "Consuelo Ortiga y Perez", correct: false } ] },
                 { question: "During his one-month vacation in Biarritz, Rizal was a guest of which family?", answers: [ { text: "The Bousteads", correct: true }, { text: "The Becketts", correct: false }, { text: "The Venturas", correct: false }, { text: "The Pardo de Taveras", correct: false } ] },
-                { question: "Rizal's proposal to Nelly Boustead failed partly because her mother disapproved. What was the other reason?", answers: [ { text: "He refused to give up his Catholic faith and convert to Protestantism", correct: true }, { text: "He was not wealthy enough", false }, { text: "He was still in love with Leonor Rivera", false }, { text: "He had to leave for the Philippines immediately", false } ] },
+                // FIX: Changed incorrect boolean values `false` to the boolean `false`.
+                { question: "Rizal's proposal to Nelly Boustead failed partly because her mother disapproved. What was the other reason?", answers: [ { text: "He refused to give up his Catholic faith and convert to Protestantism", correct: true }, { text: "He was not wealthy enough", correct: false }, { text: "He was still in love with Leonor Rivera", correct: false }, { text: "He had to leave for the Philippines immediately", correct: false } ] },
                 { question: "Where did Rizal finish the manuscript for El Filibusterismo on March 29, 1891?", answers: [ { text: "Biarritz", correct: true }, { text: "Paris", correct: false }, { text: "Ghent", correct: false }, { text: "Brussels", correct: false } ] },
             ],
             'Noli Me Tángere': [
@@ -386,7 +388,9 @@
         function startQuiz(topic) {
             currentTopic = topic;
             score = 0;
-            currentQuestions = topics[topic].sort(() => Math.random() - 0.5);
+            // FIX: Shuffle and slice the questions to get a fixed number for the quiz.
+            const allQuestions = topics[topic];
+            currentQuestions = allQuestions.sort(() => Math.random() - 0.5).slice(0, Math.min(QUESTIONS_PER_QUIZ, allQuestions.length));
             currentQuestionIndex = 0;
 
             startScreen.classList.add('hidden');
@@ -443,11 +447,14 @@
             }
             setStatusClass(selectedButton, correct);
             Array.from(answerButtonsElement.children).forEach(button => {
-                setStatusClass(button, button.dataset.correct === 'true');
+                if (button.dataset.correct === 'true') {
+                    setStatusClass(button, true);
+                }
                 button.disabled = true;
             });
             nextButton.classList.remove('hidden');
         }
+
 
         function setStatusClass(element, correct) {
             clearStatusClass(element);
